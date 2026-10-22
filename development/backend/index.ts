@@ -1,5 +1,6 @@
 import express from 'express';
 import jwt from 'jsonwebtoken';
+import 'dotenv/config';
 import { SignupSchema } from "./src/SignupSchema";
 import { LoginSchema } from './src/LoginSchema';
 import { PrismaClient } from '@prisma/client';
@@ -81,7 +82,7 @@ app.post('/api/v1/login', async (req, res) => {
         })
     }
 
-    const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: '1d' });
+    const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET!, { expiresIn: '1d' });
 
 
     return res.status(200).json({
@@ -89,9 +90,8 @@ app.post('/api/v1/login', async (req, res) => {
         userId: user.id,
         token
     })
-
-
 })
+
 
 
 
