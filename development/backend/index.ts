@@ -4,6 +4,8 @@ import 'dotenv/config';
 import { SignupSchema } from "./src/SignupSchema";
 import { LoginSchema } from './src/LoginSchema';
 import { PrismaClient } from '@prisma/client';
+import authMiddleware from './src/middleware';
+import { string } from 'zod';
 const app = express()
 app.use(express.json())
 const prisma = new PrismaClient()
@@ -92,8 +94,44 @@ app.post('/api/v1/login', async (req, res) => {
     })
 })
 
+app.get('/api/v1/users', authMiddleware, async (req, res) => {
+    const user = await prisma.user.findMany()
+    return res.status(200).json({
+        users: user
+    })
+})
 
+app.put('/api/v1/user/:id', authMiddleware, async (req, res) => {
+    const id = Number(req.params.id);
+    await prisma.user.update({
+        where: {
+            id
+        },
+        data: {
+            firstName: req.body.firstName,
+            middleName: req.body.middleName,
+            lastName: req.body.lastName,
+            email: req.body.email,
+            password: req.body.password,
+            phone: req.body.phone
+        }
+    })
+    return res.status(200).json({
+        message: "User Updated Successfully"
+    })
+})
 
+app.delete('/api/v1/user/:id', authMiddleware, async (req, res) => {
+    const id = Number(req.params.id);
+    await prisma.user.delete({
+        where: {
+            id
+        }
+    })
+    return res.status(200).json({
+        message: "User Deleted Successfully"
+    })
+})
 
 
 app.listen(3000, () => {
